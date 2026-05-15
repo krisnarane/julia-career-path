@@ -42,6 +42,18 @@ export interface Contribution {
 export interface Tech { name: string; status: Status; }
 export interface RoadmapArea { area: string; icon: string; techs: Tech[]; }
 
+export interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string; // ISO ou "mês ano"
+  location: string;
+  type: "Conferência" | "Workshop" | "Hackathon" | "Meetup" | "Curso" | "Palestra" | "Summit";
+  image: string; // URL ou caminho da imagem
+  highlights?: string[];
+  link?: string;
+}
+
 export interface SoftSkill {
   icon: string;
   title: string;
