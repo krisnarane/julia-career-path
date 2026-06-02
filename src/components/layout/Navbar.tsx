@@ -5,6 +5,7 @@ import { Menu, X, Sparkles } from "lucide-react";
 const links = [
   { to: "/", label: "Sobre" },
   { to: "/objetivo-carreira", label: "Objetivo" },
+  { to: "/metas", label: "Metas" },
   { to: "/contribuicoes", label: "Contribuições" },
   { to: "/roadmap", label: "Roadmap" },
   { to: "/soft-skills", label: "Soft Skills" },

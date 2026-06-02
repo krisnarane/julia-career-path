@@ -13,6 +13,13 @@ export const roadmap: RoadmapArea[] = [
     ],
   },
   {
+  area: "Data Engineering", icon: "Database",
+  techs: [
+    { name: "Python PySpark", status: "estudando" },
+    { name: "AWS Glue", status: "estudando" },
+  ],
+},
+  {
     area: "Cloud", icon: "Cloud",
     techs: [
       { name: "AWS Cloud Practitioner", status: "domino" },
@@ -22,6 +29,13 @@ export const roadmap: RoadmapArea[] = [
       { name: "Azure Functions", status: "estudando" },
     ],
   },
+{
+  area: "Observabilidade", icon: "Eye",
+  techs: [
+    { name: "DataDog", status: "estudando" },
+    { name: "Logs e métricas", status: "estudando" },
+  ],
+},
   {
     area: "Banco de Dados", icon: "Database",
     techs: [

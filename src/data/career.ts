@@ -12,6 +12,9 @@ export const goals: Goal[] = [
   { title: "Evoluir em Java e Spring Boot" },
   { title: "Aprender AWS aplicada a projetos reais" },
   { title: "Estudar Terraform e Infrastructure as Code" },
-  { title: "Construir projetos de backend para portfólio" },
-  { title: "Preparar certificação Azure/AWS" },
+  { title: "Dominar PySpark e processamento de dados em larga escala" },
+  { title: "Preparar certificação AWS Developer em Julho/Agosto" },
+  { title: "Implementar pipelines ETL com AWS Glue"},
+  { title: "Configurar e monitorar aplicações com Datadog" },
+  { title: "Trabalhar com AWS ECS para orquestração de containers" },
 ];

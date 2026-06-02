@@ -11,6 +11,6 @@ export const profile: Profile = {
   endDate: "2027-05-21",
   github: "https://github.com/krisnarane",
   linkedin: "https://linkedin.com/in/julia-krisnarane-moraes",
-  lastUpdate: "15 de maio de 2026",
+  lastUpdate: "02 de Junho de 2026",
   bio: "Sou apaixonada por tecnologia e construção de sistemas backend robustos. Atualmente foco meus estudos em Java, Spring Boot e Cloud (AWS e Azure), buscando evoluir como pessoa desenvolvedora e contribuir com soluções de impacto real.",
 };

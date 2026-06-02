@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SoftSkillsRouteImport } from './routes/soft-skills'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as ObjetivoCarreiraRouteImport } from './routes/objetivo-carreira'
+import { Route as MetasRouteImport } from './routes/metas'
 import { Route as ContribuicoesRouteImport } from './routes/contribuicoes'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -30,6 +31,11 @@ const ObjetivoCarreiraRoute = ObjetivoCarreiraRouteImport.update({
   path: '/objetivo-carreira',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetasRoute = MetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContribuicoesRoute = ContribuicoesRouteImport.update({
   id: '/contribuicoes',
   path: '/contribuicoes',
@@ -44,6 +50,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contribuicoes': typeof ContribuicoesRoute
+  '/metas': typeof MetasRoute
   '/objetivo-carreira': typeof ObjetivoCarreiraRoute
   '/roadmap': typeof RoadmapRoute
   '/soft-skills': typeof SoftSkillsRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contribuicoes': typeof ContribuicoesRoute
+  '/metas': typeof MetasRoute
   '/objetivo-carreira': typeof ObjetivoCarreiraRoute
   '/roadmap': typeof RoadmapRoute
   '/soft-skills': typeof SoftSkillsRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contribuicoes': typeof ContribuicoesRoute
+  '/metas': typeof MetasRoute
   '/objetivo-carreira': typeof ObjetivoCarreiraRoute
   '/roadmap': typeof RoadmapRoute
   '/soft-skills': typeof SoftSkillsRoute
@@ -68,6 +77,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/contribuicoes'
+    | '/metas'
     | '/objetivo-carreira'
     | '/roadmap'
     | '/soft-skills'
@@ -75,6 +85,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/contribuicoes'
+    | '/metas'
     | '/objetivo-carreira'
     | '/roadmap'
     | '/soft-skills'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/contribuicoes'
+    | '/metas'
     | '/objetivo-carreira'
     | '/roadmap'
     | '/soft-skills'
@@ -90,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContribuicoesRoute: typeof ContribuicoesRoute
+  MetasRoute: typeof MetasRoute
   ObjetivoCarreiraRoute: typeof ObjetivoCarreiraRoute
   RoadmapRoute: typeof RoadmapRoute
   SoftSkillsRoute: typeof SoftSkillsRoute
@@ -118,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ObjetivoCarreiraRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metas': {
+      id: '/metas'
+      path: '/metas'
+      fullPath: '/metas'
+      preLoaderRoute: typeof MetasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contribuicoes': {
       id: '/contribuicoes'
       path: '/contribuicoes'
@@ -138,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContribuicoesRoute: ContribuicoesRoute,
+  MetasRoute: MetasRoute,
   ObjetivoCarreiraRoute: ObjetivoCarreiraRoute,
   RoadmapRoute: RoadmapRoute,
   SoftSkillsRoute: SoftSkillsRoute,

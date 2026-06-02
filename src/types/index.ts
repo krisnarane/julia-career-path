@@ -25,6 +25,22 @@ export interface CareerStep {
 
 export interface Goal { title: string; }
 
+export type GoalPriority = "Alta" | "Média" | "Baixa";
+export type GoalStatus = "Planejado" | "Em progresso" | "Concluído";
+export type GoalCategory = "Backend" | "Cloud" | "Data Engineering" | "DevOps" | "Estudos";
+
+export interface Deadline {
+  id: string;
+  categoria: GoalCategory;
+  titulo: string;
+  descricao: string;
+  dataPrazo: string; // ISO format (YYYY-MM-DD)
+  prioridade: GoalPriority;
+  status: GoalStatus;
+  icon?: string; // lucide icon name
+  progresso?: number; // Manual progress (0-100), se não informado usa cálculo automático
+}
+
 export type ContributionCategory =
   | "Backend" | "Cloud" | "Infra" | "Estudos" | "Projetos" | "Comunidade";
 
