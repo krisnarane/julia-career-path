@@ -4,4 +4,14 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
+  "routes": [
+    {
+      "pattern": "krisnarane.dev/*",
+      "zone_name": "krisnarane.dev"
+    },
+    {
+      "pattern": "www.krisnarane.dev/*",
+      "zone_name": "krisnarane.dev"
+    }
+  ]
 }
