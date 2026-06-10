@@ -1,27 +1,34 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
+import { toast } from "sonner";
 import type { Deadline, GoalStatus } from "@/types";
-import { deadlines as initialDeadlines } from "@/data/goals";
 import { GoalCard } from "../ui-custom/GoalCard";
+import { GoalModal } from "../ui-custom/GoalModal";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, Clock, Target, Plus } from "lucide-react";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { deleteGoal, upsertGoal } from "@/api/goals";
 
-export function GoalsSection() {
-  const [deadlines, setDeadlines] = useState<Deadline[]>(initialDeadlines);
+function newGoalTemplate(): Deadline {
+  return {
+    id: crypto.randomUUID(),
+    categoria: "Backend",
+    titulo: "",
+    descricao: "",
+    dataPrazo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    prioridade: "Média",
+    status: "Planejado",
+    icon: "Target",
+    progresso: 0,
+  };
+}
+
+export function GoalsSection({ deadlines }: { deadlines: Deadline[] }) {
+  const isAdmin = useIsAdmin();
+  const router = useRouter();
   const [filterStatus, setFilterStatus] = useState<GoalStatus | "Todos">("Todos");
+  const [newGoal, setNewGoal] = useState<Deadline | null>(null);
 
-  // Carregar dados do localStorage ao montar
-  useEffect(() => {
-    const stored = localStorage.getItem("deadlines");
-    if (stored) {
-      try {
-        setDeadlines(JSON.parse(stored));
-      } catch (e) {
-        console.error("Erro ao carregar deadlines do localStorage", e);
-      }
-    }
-  }, []);
-
-  // Calcular estatísticas
   const stats = useMemo(() => {
     const total = deadlines.length;
     const inProgress = deadlines.filter((d) => d.status === "Em progresso").length;
@@ -29,66 +36,56 @@ export function GoalsSection() {
     return { total, inProgress, completed };
   }, [deadlines]);
 
-  // Filtrar e ordenar
   const filteredDeadlines = useMemo(() => {
     let result = deadlines;
-
     if (filterStatus !== "Todos") {
       result = result.filter((d) => d.status === filterStatus);
     }
-
     // Ordenar por data mais próxima primeiro
-    return result.sort((a, b) => {
+    return [...result].sort((a, b) => {
       const dateA = new Date(a.dataPrazo).getTime();
       const dateB = new Date(b.dataPrazo).getTime();
       return dateA - dateB;
     });
   }, [deadlines, filterStatus]);
 
-  const handleUpdateGoal = (updated: Deadline) => {
-    const stored = localStorage.getItem("deadlines");
-    const goals: Deadline[] = stored ? JSON.parse(stored) : [];
-    const index = goals.findIndex((g) => g.id === updated.id);
-    if (index >= 0) {
-      goals[index] = updated;
-    } else {
-      goals.push(updated);
+  const handleSaveGoal = async (goal: Deadline) => {
+    try {
+      await upsertGoal({ data: goal });
+      await router.invalidate();
+      toast.success("Meta salva com sucesso!");
+      return true;
+    } catch {
+      toast.error("Erro ao salvar a meta");
+      return false;
     }
-    localStorage.setItem("deadlines", JSON.stringify(goals));
-    setDeadlines(goals);
   };
 
-  const handleAddGoal = () => {
-    const newGoal: Deadline = {
-      id: Date.now().toString(),
-      categoria: "Backend",
-      titulo: "Nova meta",
-      descricao: "",
-      dataPrazo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      prioridade: "Média",
-      status: "Planejado",
-      icon: "Target",
-      progresso: 0,
-    };
-    const stored = localStorage.getItem("deadlines");
-    const goals: Deadline[] = stored ? JSON.parse(stored) : [];
-    goals.push(newGoal);
-    localStorage.setItem("deadlines", JSON.stringify(goals));
-    setDeadlines(goals);
+  const handleDeleteGoal = async (id: string) => {
+    try {
+      await deleteGoal({ data: { id } });
+      await router.invalidate();
+      toast.success("Meta deletada com sucesso!");
+      return true;
+    } catch {
+      toast.error("Erro ao deletar a meta");
+      return false;
+    }
   };
 
   return (
     <section className="py-10">
-      {/* Botão Adicionar Nova Meta */}
-      <div className="mb-6 flex justify-end">
-        <button
-          onClick={handleAddGoal}
-          className="px-5 py-2.5 rounded-full gradient-primary text-white font-medium shadow-soft hover:shadow-lg transition-all flex items-center gap-2"
-        >
-          <Plus className="h-5 w-5" />
-          Adicionar Nova Meta
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="mb-6 flex justify-end">
+          <button
+            onClick={() => setNewGoal(newGoalTemplate())}
+            className="px-5 py-2.5 rounded-full gradient-primary text-white font-medium shadow-soft hover:shadow-lg transition-all flex items-center gap-2"
+          >
+            <Plus className="h-5 w-5" />
+            Adicionar Nova Meta
+          </button>
+        </div>
+      )}
       {/* Cards de Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Card className="glass rounded-3xl border border-border p-6 flex items-center gap-4">
@@ -146,7 +143,9 @@ export function GoalsSection() {
             <GoalCard
               key={goal.id}
               goal={goal}
-              onUpdate={handleUpdateGoal}
+              editable={isAdmin}
+              onSave={handleSaveGoal}
+              onDelete={handleDeleteGoal}
             />
           ))}
         </div>
@@ -154,6 +153,20 @@ export function GoalsSection() {
         <div className="text-center py-12">
           <p className="text-muted-foreground">Nenhuma meta encontrada para este filtro.</p>
         </div>
+      )}
+
+      {/* Modal de nova meta */}
+      {newGoal && (
+        <GoalModal
+          isOpen
+          goal={newGoal}
+          onClose={() => setNewGoal(null)}
+          onSave={async (g) => {
+            const ok = await handleSaveGoal(g);
+            if (ok) setNewGoal(null);
+            return ok;
+          }}
+        />
       )}
     </section>
   );

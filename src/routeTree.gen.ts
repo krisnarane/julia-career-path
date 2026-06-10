@@ -15,6 +15,7 @@ import { Route as ObjetivoCarreiraRouteImport } from './routes/objetivo-carreira
 import { Route as MetasRouteImport } from './routes/metas'
 import { Route as ContribuicoesRouteImport } from './routes/contribuicoes'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 
 const SoftSkillsRoute = SoftSkillsRouteImport.update({
   id: '/soft-skills',
@@ -46,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/objetivo-carreira': typeof ObjetivoCarreiraRoute
   '/roadmap': typeof RoadmapRoute
   '/soft-skills': typeof SoftSkillsRoute
+  '/admin/login': typeof AdminLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/objetivo-carreira': typeof ObjetivoCarreiraRoute
   '/roadmap': typeof RoadmapRoute
   '/soft-skills': typeof SoftSkillsRoute
+  '/admin/login': typeof AdminLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/objetivo-carreira': typeof ObjetivoCarreiraRoute
   '/roadmap': typeof RoadmapRoute
   '/soft-skills': typeof SoftSkillsRoute
+  '/admin/login': typeof AdminLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/objetivo-carreira'
     | '/roadmap'
     | '/soft-skills'
+    | '/admin/login'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/objetivo-carreira'
     | '/roadmap'
     | '/soft-skills'
+    | '/admin/login'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/objetivo-carreira'
     | '/roadmap'
     | '/soft-skills'
+    | '/admin/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   ObjetivoCarreiraRoute: typeof ObjetivoCarreiraRoute
   RoadmapRoute: typeof RoadmapRoute
   SoftSkillsRoute: typeof SoftSkillsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   ObjetivoCarreiraRoute: ObjetivoCarreiraRoute,
   RoadmapRoute: RoadmapRoute,
   SoftSkillsRoute: SoftSkillsRoute,
+  AdminLoginRoute: AdminLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

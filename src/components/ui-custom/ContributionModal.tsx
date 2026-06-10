@@ -1,4 +1,4 @@
-import type { Deadline, GoalCategory, GoalPriority, GoalStatus } from "@/types";
+import type { Contribution, ContributionCategory } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -30,38 +30,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { StringListEditor } from "./StringListEditor";
 
-interface GoalModalProps {
+interface ContributionModalProps {
   isOpen: boolean;
-  goal: Deadline;
+  contribution: Contribution;
+  isNew?: boolean;
   onClose: () => void;
-  onSave: (updated: Deadline) => Promise<boolean>;
+  onSave: (updated: Contribution) => Promise<boolean>;
   onDelete?: (id: string) => Promise<boolean>;
 }
 
-const CATEGORIES: GoalCategory[] = ["Backend", "Cloud", "Data Engineering", "DevOps", "Estudos"];
-const PRIORITIES: GoalPriority[] = ["Alta", "Média", "Baixa"];
-const STATUSES: GoalStatus[] = ["Planejado", "Em progresso", "Concluído"];
+const CATEGORIES: ContributionCategory[] = [
+  "Backend",
+  "Cloud",
+  "Infra",
+  "Estudos",
+  "Projetos",
+  "Comunidade",
+];
+const STATUSES: Contribution["status"][] = ["Em andamento", "Concluído", "Planejado"];
 
-export function GoalModal({ isOpen, goal, onClose, onSave, onDelete }: GoalModalProps) {
-  const [formData, setFormData] = useState<Deadline>(goal);
+export function ContributionModal({
+  isOpen,
+  contribution,
+  isNew,
+  onClose,
+  onSave,
+  onDelete,
+}: ContributionModalProps) {
+  const [formData, setFormData] = useState<Contribution>(contribution);
   const [saving, setSaving] = useState(false);
 
-  const handleChange = <K extends keyof Deadline>(field: K, value: Deadline[K]) => {
+  const handleChange = <K extends keyof Contribution>(field: K, value: Contribution[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
-    if (!formData.titulo.trim()) {
+    if (!formData.title.trim()) {
       toast.error("Título é obrigatório");
       return;
     }
-    if (!formData.dataPrazo) {
-      toast.error("Data de prazo é obrigatória");
-      return;
-    }
     setSaving(true);
-    const ok = await onSave(formData);
+    const ok = await onSave({ ...formData, icon: formData.icon.trim() || "Sparkles" });
     setSaving(false);
     if (ok) onClose();
   };
@@ -69,7 +80,7 @@ export function GoalModal({ isOpen, goal, onClose, onSave, onDelete }: GoalModal
   const handleDelete = async () => {
     if (!onDelete) return;
     setSaving(true);
-    const ok = await onDelete(goal.id);
+    const ok = await onDelete(contribution.id);
     setSaving(false);
     if (ok) onClose();
   };
@@ -78,18 +89,27 @@ export function GoalModal({ isOpen, goal, onClose, onSave, onDelete }: GoalModal
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Editar Meta</DialogTitle>
+          <DialogTitle>{isNew ? "Nova Contribuição" : "Editar Contribuição"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Categoria */}
           <div className="space-y-2">
-            <Label htmlFor="categoria">Categoria</Label>
+            <Label htmlFor="c-title">Título *</Label>
+            <Input
+              id="c-title"
+              value={formData.title}
+              onChange={(e) => handleChange("title", e.target.value)}
+              placeholder="Ex: Estudos para certificação AZ-204"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="c-category">Categoria</Label>
             <Select
-              value={formData.categoria}
-              onValueChange={(v) => handleChange("categoria", v as GoalCategory)}
+              value={formData.category}
+              onValueChange={(v) => handleChange("category", v as ContributionCategory)}
             >
-              <SelectTrigger id="categoria">
+              <SelectTrigger id="c-category">
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
@@ -102,68 +122,42 @@ export function GoalModal({ isOpen, goal, onClose, onSave, onDelete }: GoalModal
             </Select>
           </div>
 
-          {/* Título */}
           <div className="space-y-2">
-            <Label htmlFor="titulo">Título *</Label>
-            <Input
-              id="titulo"
-              value={formData.titulo}
-              onChange={(e) => handleChange("titulo", e.target.value)}
-              placeholder="Ex: Dominar PySpark avançado"
-            />
-          </div>
-
-          {/* Descrição */}
-          <div className="space-y-2">
-            <Label htmlFor="descricao">Descrição</Label>
+            <Label htmlFor="c-description">Descrição</Label>
             <Textarea
-              id="descricao"
-              value={formData.descricao}
-              onChange={(e) => handleChange("descricao", e.target.value)}
-              placeholder="Descreva os detalhes da meta"
+              id="c-description"
+              value={formData.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              placeholder="Descreva a contribuição"
               rows={3}
             />
           </div>
 
-          {/* Data de Prazo */}
           <div className="space-y-2">
-            <Label htmlFor="dataPrazo">Data de Prazo *</Label>
-            <Input
-              id="dataPrazo"
-              type="date"
-              value={formData.dataPrazo}
-              onChange={(e) => handleChange("dataPrazo", e.target.value)}
+            <Label>Tecnologias</Label>
+            <StringListEditor
+              values={formData.technologies}
+              onChange={(v) => handleChange("technologies", v)}
+              placeholder="Ex: Java, AWS, Terraform..."
             />
           </div>
 
-          {/* Prioridade */}
           <div className="space-y-2">
-            <Label htmlFor="prioridade">Prioridade</Label>
-            <Select
-              value={formData.prioridade}
-              onValueChange={(v) => handleChange("prioridade", v as GoalPriority)}
-            >
-              <SelectTrigger id="prioridade">
-                <SelectValue placeholder="Selecione a prioridade" />
-              </SelectTrigger>
-              <SelectContent>
-                {PRIORITIES.map((p) => (
-                  <SelectItem key={p} value={p}>
-                    {p}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Impactos</Label>
+            <StringListEditor
+              values={formData.impacts}
+              onChange={(v) => handleChange("impacts", v)}
+              placeholder="Ex: Evolução em cloud"
+            />
           </div>
 
-          {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="c-status">Status</Label>
             <Select
               value={formData.status}
-              onValueChange={(v) => handleChange("status", v as GoalStatus)}
+              onValueChange={(v) => handleChange("status", v as Contribution["status"])}
             >
-              <SelectTrigger id="status">
+              <SelectTrigger id="c-status">
                 <SelectValue placeholder="Selecione o status" />
               </SelectTrigger>
               <SelectContent>
@@ -176,22 +170,14 @@ export function GoalModal({ isOpen, goal, onClose, onSave, onDelete }: GoalModal
             </Select>
           </div>
 
-          {/* Progresso Manual */}
           <div className="space-y-2">
-            <Label htmlFor="progresso">Progresso: {formData.progresso ?? 0}%</Label>
-            <input
-              id="progresso"
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              value={formData.progresso ?? 0}
-              onChange={(e) => handleChange("progresso", parseInt(e.target.value))}
-              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+            <Label htmlFor="c-icon">Ícone (nome do Lucide)</Label>
+            <Input
+              id="c-icon"
+              value={formData.icon}
+              onChange={(e) => handleChange("icon", e.target.value)}
+              placeholder="Ex: GraduationCap, Cloud, Users"
             />
-            <p className="text-xs text-muted-foreground">
-              Arraste para atualizar o progresso da meta (0-100%)
-            </p>
           </div>
         </div>
 
@@ -205,9 +191,9 @@ export function GoalModal({ isOpen, goal, onClose, onSave, onDelete }: GoalModal
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Deletar meta?</AlertDialogTitle>
+                  <AlertDialogTitle>Deletar contribuição?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Essa ação não pode ser desfeita. A meta "{goal.titulo}" será removida
+                    Essa ação não pode ser desfeita. "{contribution.title}" será removida
                     permanentemente.
                   </AlertDialogDescription>
                 </AlertDialogHeader>

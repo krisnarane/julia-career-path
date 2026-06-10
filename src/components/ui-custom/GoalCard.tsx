@@ -7,16 +7,18 @@ import { Progress } from "@/components/ui/progress";
 
 interface GoalCardProps {
   goal: Deadline;
-  onUpdate?: (updated: Deadline) => void;
+  editable?: boolean;
+  onSave: (updated: Deadline) => Promise<boolean>;
+  onDelete: (id: string) => Promise<boolean>;
 }
 
-export function GoalCard({ goal, onUpdate }: GoalCardProps) {
+export function GoalCard({ goal, editable = false, onSave, onDelete }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const { daysRemaining, percentComplete, isOverdue } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const targetDate = new Date(goal.dataPrazo);
     targetDate.setHours(0, 0, 0, 0);
 
@@ -28,7 +30,7 @@ export function GoalCard({ goal, onUpdate }: GoalCardProps) {
       return {
         daysRemaining: daysRemain,
         percentComplete: Math.min(Math.max(goal.progresso, 0), 100),
-        isOverdue: daysRemain < 0
+        isOverdue: daysRemain < 0,
       };
     }
 
@@ -40,7 +42,7 @@ export function GoalCard({ goal, onUpdate }: GoalCardProps) {
     // Calcular progresso automaticamente baseado em tempo decorrido
     const createdDate = new Date(goal.dataPrazo);
     createdDate.setDate(createdDate.getDate() - 60); // Assume criada há 60 dias antes do prazo
-    
+
     const totalDays = Math.ceil((targetDate.getTime() - createdDate.getTime()) / msPerDay);
     const elapsedDays = Math.ceil((today.getTime() - createdDate.getTime()) / msPerDay);
     const percent = Math.min(Math.max((elapsedDays / totalDays) * 100, 0), 100);
@@ -48,31 +50,36 @@ export function GoalCard({ goal, onUpdate }: GoalCardProps) {
     return {
       daysRemaining: daysRemain,
       percentComplete: Math.round(percent),
-      isOverdue: daysRemain < 0
+      isOverdue: daysRemain < 0,
     };
-  }, [goal])
+  }, [goal]);
 
   const priorityConfig = {
-    "Alta": { bg: "bg-destructive/10", text: "text-destructive", badge: "bg-destructive/20 text-destructive" },
-    "Média": { bg: "bg-warning/10", text: "text-warning", badge: "bg-warning/20 text-warning" },
-    "Baixa": { bg: "bg-success/10", text: "text-success", badge: "bg-success/20 text-success" },
+    Alta: {
+      bg: "bg-destructive/10",
+      text: "text-destructive",
+      badge: "bg-destructive/20 text-destructive",
+    },
+    Média: { bg: "bg-warning/10", text: "text-warning", badge: "bg-warning/20 text-warning" },
+    Baixa: { bg: "bg-success/10", text: "text-success", badge: "bg-success/20 text-success" },
   };
 
   const statusConfig = {
-    "Planejado": { badge: "bg-primary/20 text-primary" },
+    Planejado: { badge: "bg-primary/20 text-primary" },
     "Em progresso": { badge: "bg-accent/20 text-accent" },
-    "Concluído": { badge: "bg-success/20 text-success" },
+    Concluído: { badge: "bg-success/20 text-success" },
   };
 
   const priority = priorityConfig[goal.prioridade];
   const status = statusConfig[goal.status];
-  const IconComponent = ((Icons as unknown as Record<string, LucideIcon>)[goal.icon || "Target"]) ?? Icons.Target;
+  const IconComponent =
+    (Icons as unknown as Record<string, LucideIcon>)[goal.icon || "Target"] ?? Icons.Target;
 
   return (
     <>
       <article
-        onClick={() => setIsOpen(true)}
-        className="group glass rounded-3xl border border-border p-5 cursor-pointer transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10 animate-fade-in"
+        onClick={editable ? () => setIsOpen(true) : undefined}
+        className={`group glass rounded-3xl border border-border p-5 transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10 animate-fade-in ${editable ? "cursor-pointer" : ""}`}
       >
         {/* Header com ícone e titulo */}
         <div className="flex items-start gap-3 mb-3">
@@ -85,23 +92,17 @@ export function GoalCard({ goal, onUpdate }: GoalCardProps) {
             <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-primary transition">
               {goal.titulo}
             </h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              {goal.categoria}
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">{goal.categoria}</p>
           </div>
         </div>
 
         {/* Descrição */}
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-          {goal.descricao}
-        </p>
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{goal.descricao}</p>
 
         {/* Barra de progresso */}
         <div className="mb-3">
           <Progress value={percentComplete} className="h-2" />
-          <p className="text-xs text-muted-foreground mt-1">
-            {percentComplete}% concluído
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">{percentComplete}% concluído</p>
         </div>
 
         {/* Badges e info de tempo */}
@@ -118,7 +119,9 @@ export function GoalCard({ goal, onUpdate }: GoalCardProps) {
 
         {/* Informação de dias restantes */}
         {goal.status !== "Concluído" && (
-          <div className={`text-xs font-medium ${isOverdue ? "text-destructive" : "text-muted-foreground"}`}>
+          <div
+            className={`text-xs font-medium ${isOverdue ? "text-destructive" : "text-muted-foreground"}`}
+          >
             {isOverdue ? (
               <span>⚠️ Prazo vencido há {Math.abs(daysRemaining)} dias</span>
             ) : daysRemaining === 0 ? (
@@ -128,24 +131,22 @@ export function GoalCard({ goal, onUpdate }: GoalCardProps) {
             )}
           </div>
         )}
-        
+
         {goal.status === "Concluído" && (
-          <div className="text-xs font-medium text-success">
-            ✅ Meta concluída
-          </div>
+          <div className="text-xs font-medium text-success">✅ Meta concluída</div>
         )}
       </article>
 
       {/* Modal de edição */}
-      <GoalModal
-        isOpen={isOpen}
-        goal={goal}
-        onClose={() => setIsOpen(false)}
-        onUpdate={(updated) => {
-          onUpdate?.(updated);
-          setIsOpen(false);
-        }}
-      />
+      {editable && isOpen && (
+        <GoalModal
+          isOpen={isOpen}
+          goal={goal}
+          onClose={() => setIsOpen(false)}
+          onSave={onSave}
+          onDelete={onDelete}
+        />
+      )}
     </>
   );
 }

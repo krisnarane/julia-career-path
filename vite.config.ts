@@ -12,4 +12,9 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
+  vite: {
+    // Módulo virtual do workerd: só existe no build (plugin cloudflare); em dev
+    // nunca é executado (ver src/server/bindings.ts), mas o scanner precisa ignorá-lo.
+    optimizeDeps: { exclude: ["cloudflare:workers"] },
+  },
 });

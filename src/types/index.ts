@@ -12,8 +12,7 @@ export interface Profile {
   linkedin: string;
   lastUpdate: string;
   bio: string;
-  profileImage?: string;  // URL da foto de perfil
-
+  profileImage?: string; // URL da foto de perfil
 }
 
 export interface CareerStep {
@@ -23,7 +22,9 @@ export interface CareerStep {
   current?: boolean;
 }
 
-export interface Goal { title: string; }
+export interface Goal {
+  title: string;
+}
 
 export type GoalPriority = "Alta" | "Média" | "Baixa";
 export type GoalStatus = "Planejado" | "Em progresso" | "Concluído";
@@ -42,7 +43,12 @@ export interface Deadline {
 }
 
 export type ContributionCategory =
-  | "Backend" | "Cloud" | "Infra" | "Estudos" | "Projetos" | "Comunidade";
+  | "Backend"
+  | "Cloud"
+  | "Infra"
+  | "Estudos"
+  | "Projetos"
+  | "Comunidade";
 
 export interface Contribution {
   id: string;
@@ -55,8 +61,16 @@ export interface Contribution {
   status: "Em andamento" | "Concluído" | "Planejado";
 }
 
-export interface Tech { name: string; status: Status; }
-export interface RoadmapArea { area: string; icon: string; techs: Tech[]; }
+export interface Tech {
+  name: string;
+  status: Status;
+}
+export interface RoadmapArea {
+  id: string;
+  area: string;
+  icon: string;
+  techs: Tech[];
+}
 
 export interface Event {
   id: string;
@@ -71,6 +85,7 @@ export interface Event {
 }
 
 export interface SoftSkill {
+  id: string;
   icon: string;
   title: string;
   description: string;
