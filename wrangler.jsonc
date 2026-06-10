@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "tanstack-start-app",
+	"name": "julia-career-path",
 	"compatibility_date": "2025-09-24",
 	"compatibility_flags": [
 		"nodejs_compat"
@@ -12,12 +12,6 @@
 			"database_name": "julia-pdi",
 			"database_id": "d30b9500-7598-4f13-a988-53396fa976b0",
 			"migrations_dir": "migrations"
-		},
-		{
-			"binding": "julia_pdi",
-			"database_name": "julia-pdi",
-			"database_id": "d30b9500-7598-4f13-a988-53396fa976b0",
-			"remote": true
 		}
 	],
 	"routes": [
