@@ -73,6 +73,35 @@
   --shadow-glow: 0 0 40px color-mix(in oklab, oklch(0.82 0.11 0) 40%, transparent);
 }
 
+.dark {
+  --background: oklch(0.17 0.02 285);
+  --foreground: oklch(0.95 0.01 340);
+  --card: oklch(0.21 0.025 285);
+  --card-foreground: oklch(0.95 0.01 340);
+  --popover: oklch(0.21 0.025 285);
+  --popover-foreground: oklch(0.95 0.01 340);
+  --primary: oklch(0.78 0.12 0);
+  --primary-foreground: oklch(0.17 0.02 285);
+  --primary-deep: oklch(0.7 0.16 0);
+  --secondary: oklch(0.27 0.03 320);
+  --secondary-foreground: oklch(0.95 0.01 340);
+  --muted: oklch(0.26 0.02 285);
+  --muted-foreground: oklch(0.7 0.02 285);
+  --accent: oklch(0.62 0.22 295);
+  --accent-foreground: oklch(0.98 0 0);
+  --info: oklch(0.7 0.13 230);
+  --info-foreground: oklch(0.17 0.02 285);
+  --success: oklch(0.7 0.17 145);
+  --success-foreground: oklch(0.17 0.02 285);
+  --warning: oklch(0.8 0.16 95);
+  --warning-foreground: oklch(0.17 0.02 285);
+  --destructive: oklch(0.62 0.21 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.3 0.02 320);
+  --input: oklch(0.3 0.02 320);
+  --ring: oklch(0.78 0.12 0);
+}
+
 @layer base {
   * { border-color: var(--color-border); }
   body {
@@ -104,6 +133,7 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+.dark .glass { background: color-mix(in oklab, black 35%, transparent); }
 .gradient-primary { background-image: var(--gradient-primary); }
 .gradient-soft { background-image: var(--gradient-soft); }
 .shadow-soft { box-shadow: var(--shadow-soft); }

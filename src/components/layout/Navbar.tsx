@@ -1,8 +1,26 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, Sparkles, LogOut, ShieldCheck } from "lucide-react";
+import { Menu, X, Sparkles, LogOut, ShieldCheck, Sun, Moon } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { logoutFn } from "@/api/auth";
+
+function ThemeToggle({ className = "" }: { className?: string }) {
+  const toggleTheme = () => {
+    const isDark = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  };
+  return (
+    <button
+      onClick={toggleTheme}
+      className={`p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition ${className}`}
+      title="Alternar tema"
+      aria-label="Alternar tema claro/escuro"
+    >
+      <Sun className="h-4 w-4 dark:hidden" />
+      <Moon className="h-4 w-4 hidden dark:block" />
+    </button>
+  );
+}
 
 const links = [
   { to: "/", label: "Sobre" },
@@ -63,14 +81,20 @@ export function Navbar() {
               </button>
             </li>
           )}
+          <li className="ml-1">
+            <ThemeToggle />
+          </li>
         </ul>
-        <button
-          className="md:hidden p-2 rounded-lg hover:bg-secondary"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Menu"
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="md:hidden flex items-center gap-1">
+          <ThemeToggle />
+          <button
+            className="p-2 rounded-lg hover:bg-secondary"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Menu"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </nav>
       {open && (
         <div className="md:hidden border-t border-border animate-fade-in">
