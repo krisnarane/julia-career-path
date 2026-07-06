@@ -67,7 +67,9 @@ export const loginFn = createServerFn({ method: "POST" })
     }
     setCookie(COOKIE_NAME, await signSession(SESSION_SECRET), {
       httpOnly: true,
-      secure: true,
+      // Em dev o servidor roda em http://localhost (sem TLS); um cookie
+      // Secure é silenciosamente descartado pelo navegador nesse caso.
+      secure: !import.meta.env.DEV,
       sameSite: "lax",
       path: "/",
       maxAge: SESSION_DAYS * 24 * 60 * 60,

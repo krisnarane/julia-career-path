@@ -16,13 +16,14 @@ export interface Profile {
 }
 
 export interface CareerStep {
-  id: number;
+  id: string;
   title: string;
   focus: string;
   current?: boolean;
 }
 
 export interface Goal {
+  id: string;
   title: string;
 }
 

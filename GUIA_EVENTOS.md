@@ -1,14 +1,15 @@
 # 📸 Guia: Adicionar e Personalizar Eventos
 
-## ✅ O que foi criado
+## ✅ Como funciona hoje
 
-A seção de eventos foi implementada com:
+A seção de eventos é editável direto pela UI, logada como admin, e os dados ficam no banco D1 (não mais em arquivo estático):
 
 1. **Tipo de dado**: `Event` interface em [src/types/index.ts](src/types/index.ts)
-2. **Dados**: 4 eventos de exemplo em [src/data/events.ts](src/data/events.ts)
+2. **API**: `listEvents` / `upsertEvent` / `deleteEvent` em [src/api/events.ts](src/api/events.ts), tabela `events` no D1
 3. **Componente**: `EventCard` em [src/components/ui-custom/EventCard.tsx](src/components/ui-custom/EventCard.tsx)
-4. **Seção**: `EventsSection` em [src/components/sections/EventsSection.tsx](src/components/sections/EventsSection.tsx)
-5. **Integração**: Adicionado na página inicial [src/routes/index.tsx](src/routes/index.tsx)
+4. **Modal de edição**: [src/components/ui-custom/EventModal.tsx](src/components/ui-custom/EventModal.tsx)
+5. **Seção**: `EventsSection` em [src/components/sections/EventsSection.tsx](src/components/sections/EventsSection.tsx)
+6. **Integração**: página inicial [src/routes/index.tsx](src/routes/index.tsx) (loader `listEvents()`)
 
 ---
 
@@ -26,47 +27,16 @@ Os cards de evento têm:
 
 ---
 
-## 📝 Editar Eventos Existentes
+## 📝 Editar, adicionar ou remover eventos
 
-Abra [src/data/events.ts](src/data/events.ts) e modifique os eventos:
+Tudo isso agora é feito pela UI, logada como admin:
 
-```typescript
-{
-  id: "seu-evento-unico",                    // ID único (use kebab-case)
-  title: "Nome do Evento",                   // Título em destaque
-  description: "Descrição breve do evento",  // Descrição (até ~100 caracteres)
-  date: "Mês Ano",                           // Ex: "Maio 2026", "Novembro 2025"
-  location: "Cidade, Estado",                // Ex: "São Paulo, SP" ou "Online"
-  type: "Conferência",                       // Tipo: Conferência | Workshop | Hackathon | Meetup | Curso | Palestra
-  image: "/images/event-nome.jpg",           // Caminho da imagem em public/images/
-  highlights: ["Tag 1", "Tag 2", "Tag 3"],  // Tags com skills/tópicos
-  link: "https://link-do-evento.com",       // Link externo (opcional)
-}
-```
+1. Acesse `/` (página inicial) logada como admin.
+2. Na seção "Eventos e Participações", use o botão "Adicionar Evento" para criar um novo, ou o ícone de lápis no canto de cada card para editar.
+3. No modal, preencha: título, descrição, data (texto livre, ex: "Maio 2026"), local, tipo (select), imagem (URL ou caminho em `/images/`), destaques (tags) e link (opcional).
+4. Salve — a mudança já aparece na página. Para excluir, use "Deletar" dentro do modal de edição (com confirmação).
 
----
-
-## ➕ Adicionar Novo Evento
-
-Abra [src/data/events.ts](src/data/events.ts) e adicione ao final do array:
-
-```typescript
-export const events: Event[] = [
-  // ... eventos existentes ...
-  
-  {
-    id: "python-summit-2026",
-    title: "Python Summit Brasil 2026",
-    description: "Conferência anual de Python com palestras, workshops e networking.",
-    date: "Julho 2026",
-    location: "Rio de Janeiro, RJ",
-    type: "Conferência",
-    image: "/images/event-python-summit.jpg",
-    highlights: ["Python", "Backend", "Data Science", "Community"],
-    link: "https://pythonsummit.com.br",
-  },
-];
-```
+Deslogada, a seção fica somente leitura.
 
 ---
 
@@ -77,11 +47,10 @@ export const events: Event[] = [
 public/
 └── images/
     ├── profile.jpeg            (sua foto)
-    ├── event-itau.jpg          (evento Itaú)
-    ├── event-aws.jpg           (evento AWS)
-    ├── event-hackathon.jpg     (hackathon)
-    ├── event-women-tech.jpg    (meetup mulheres)
-    └── event-python-summit.jpg (novo evento)
+    ├── event-microsoft.jpg
+    ├── event-google-cloud.jpg
+    ├── event-amazon.jpg
+    └── event-spiw.jpg
 ```
 
 ### **Como adicionar imagens:**
@@ -97,6 +66,8 @@ public/
 cp "C:\caminho\da\foto.jpg" "C:\Users\jukia\Downloads\julia-career-path\public\images\event-seu-evento.jpg"
 ```
 
+Depois, no modal de edição do evento, informe o caminho no campo "Imagem" (ex: `/images/event-seu-evento.jpg`). Também é possível usar uma URL externa completa.
+
 **Recomendações:**
 - ✅ Formato: JPG ou PNG
 - ✅ Tamanho: 800x450px (16:9) ou redimensiona automaticamente
@@ -109,13 +80,13 @@ cp "C:\caminho\da\foto.jpg" "C:\Users\jukia\Downloads\julia-career-path\public\i
 
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
-| `id` | string | ✅ | Identificador único (usar kebab-case) |
+| `id` | string | ✅ | Gerado automaticamente ao criar pela UI |
 | `title` | string | ✅ | Nome do evento |
-| `description` | string | ✅ | Descrição breve (~100 caracteres) |
+| `description` | string | ❌ | Descrição breve (~100 caracteres) |
 | `date` | string | ✅ | Data do evento (ex: "Maio 2026") |
 | `location` | string | ✅ | Local (ex: "São Paulo, SP" ou "Online") |
-| `type` | string | ✅ | Tipo: Conferência \| Workshop \| Hackathon \| Meetup \| Curso \| Palestra |
-| `image` | string | ✅ | Caminho da imagem em `/images/` |
+| `type` | string | ✅ | Tipo: Conferência \| Workshop \| Hackathon \| Meetup \| Curso \| Palestra \| Summit |
+| `image` | string | ❌ | Caminho da imagem em `/images/` ou URL externa |
 | `highlights` | string[] | ❌ | Tags com tópicos/skills (ex: ["Java", "Backend"]) |
 | `link` | string | ❌ | URL externa para mais informações |
 
@@ -130,35 +101,8 @@ type: "Hackathon"    // Competições/hackathons
 type: "Meetup"       // Encontros locais
 type: "Curso"        // Cursos online/presenciais
 type: "Palestra"     // Palestras e talks
+type: "Summit"       // Summits
 ```
-
----
-
-## 🎬 Exemplo Completo: Adicionar Novo Evento
-
-**1. Adicione em** [src/data/events.ts](src/data/events.ts):
-```typescript
-{
-  id: "tech-conference-2026",
-  title: "Tech Conference Brasil 2026",
-  description: "Grande conferência de tecnologia com as principais tendências do mercado.",
-  date: "Agosto 2026",
-  location: "Brasília, DF",
-  type: "Conferência",
-  image: "/images/event-tech-conf.jpg",
-  highlights: ["Inovação", "Cloud", "AI", "Networking"],
-  link: "https://techconference.com.br",
-},
-```
-
-**2. Coloque a imagem em:** `public/images/event-tech-conf.jpg`
-
-**3. Rode o servidor:**
-```bash
-npm run dev
-```
-
-**4. Veja a novo card aparecer na página inicial!** 🚀
 
 ---
 
@@ -216,18 +160,9 @@ npm run dev
 
 # Ir para http://localhost:5173
 # Ver seção "Eventos e Participações" após o hero
+# Logue como admin para ver os botões de edição
 ```
 
 ---
 
-## 📊 Estatísticas
-
-Atualmente tem:
-- 4 eventos de exemplo
-- 4 tipos de eventos diferentes
-- Imagens em placeholder (mostram gradiente)
-- Pronto para adicionar quantos eventos quiser!
-
----
-
-**Próximo passo**: Adicione suas imagens em `public/images/` e pronto! 🎉
+**Persistência**: os eventos ficam no banco D1 local (`npm run db:migrate:local`) e, quando aprovado, no remoto (`npm run db:migrate:remote`).

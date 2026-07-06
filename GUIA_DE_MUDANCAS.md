@@ -43,32 +43,13 @@ export const profile: Profile = {
 
 #### Situação: "Quero adicionar uma nova meta de carreira ou mudar meu focus"
 
-**Arquivo**: [src/data/career.ts](src/data/career.ts)
+**Isso agora é editado direto pela UI, logada como admin** (não é mais um arquivo estático).
 
-```typescript
-// Para ADICIONAR uma nova etapa:
-export const careerSteps: CareerStep[] = [
-  { id: 1, title: "Estagiária", focus: "Java, Spring Boot, SQL, AWS...", current: true },
-  { id: 2, title: "Desenvolvedora Júnior", focus: "APIs REST, testes..." },
-  // ← ADICIONE AQUI:
-  { 
-    id: 6, 
-    title: "Consultora Técnica", 
-    focus: "Arquitetura de soluções e consultoria",
-    current: false 
-  },
-];
+1. Acesse `/objetivo-carreira` logada como admin.
+2. Para etapas da timeline: use o botão "Adicionar Etapa" ou o ícone de lápis em cada etapa para editar título, foco e marcar a etapa atual.
+3. Para as metas em andamento (card lateral): use o "+" para adicionar, ou os ícones de lápis/lixeira em cada meta para editar ou remover.
 
-// Para MUDAR UMA META:
-export const goals: Goal[] = [
-  { title: "Evoluir em Java e Spring Boot" },  // ← MUDE O TEXTO AQUI
-  { title: "Aprender AWS aplicada a projetos reais" },
-  // ← OU ADICIONE UMA NOVA:
-  { title: "Aprender Kubernetes e Docker" },
-];
-```
-
-**O que muda**: Aparece na página de Objetivo de Carreira (`/objetivo-carreira`).
+As alterações são salvas no banco D1 (tabelas `career_steps` e `career_goals` via `src/api/career.ts`) e refletidas imediatamente na página.
 
 ---
 
@@ -639,8 +620,8 @@ wrangler publish
 | Adicionar skill | `src/data/softSkills.ts` | adicione ao array |
 | Mudar cor do tema | `src/styles.css` | variáveis CSS |
 | Adicionar página | `src/routes/` | novo arquivo `.tsx` |
-| Alterar projeto | `src/data/contributions.ts` | item do array |
-| Mudar objetivo | `src/data/career.ts` | `goals` array |
+| Alterar projeto | página `/contribuicoes` (logada como admin) | editar/adicionar contribuição pela UI |
+| Mudar objetivo | página `/objetivo-carreira` (logada como admin) | editar etapas/metas pela UI |
 | Modificar navbar | `src/components/layout/Navbar.tsx` | `links` array |
 | Adicionar ícone | qualquer lugar | use `lucide-react` |
 | Testar mudanças | terminal | `npm run dev` |

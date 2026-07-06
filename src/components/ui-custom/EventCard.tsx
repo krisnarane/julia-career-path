@@ -1,9 +1,19 @@
 import type { Event } from "@/types";
-import { Calendar, MapPin, ExternalLink } from "lucide-react";
+import { Calendar, MapPin, ExternalLink, Pencil } from "lucide-react";
 
-export function EventCard({ item }: { item: Event }) {
+export function EventCard({ item, onEdit }: { item: Event; onEdit?: () => void }) {
   return (
-    <article className="group glass rounded-3xl border border-border overflow-hidden hover-scale hover:border-primary hover:shadow-soft animate-fade-in transition-all">
+    <article className="group relative glass rounded-3xl border border-border overflow-hidden hover-scale hover:border-primary hover:shadow-soft animate-fade-in transition-all">
+      {onEdit && (
+        <button
+          onClick={onEdit}
+          className="absolute top-3 left-3 z-10 p-2 rounded-full bg-white/90 text-muted-foreground hover:text-foreground hover:bg-white transition shadow-soft"
+          title="Editar evento"
+          aria-label="Editar evento"
+        >
+          <Pencil className="h-4 w-4" />
+        </button>
+      )}
       {/* Imagem do evento */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
         {item.image ? (
@@ -31,9 +41,7 @@ export function EventCard({ item }: { item: Event }) {
           {item.title}
         </h3>
 
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-          {item.description}
-        </p>
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{item.description}</p>
 
         {/* Data e Local */}
         <div className="space-y-2 mb-4 text-sm">
