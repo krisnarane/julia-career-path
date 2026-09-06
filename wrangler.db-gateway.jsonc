@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "julia-career-path-db",
+  "main": "workers/db-gateway.ts",
+  "compatibility_date": "2026-08-30",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "julia-pdi",
+      "database_id": "d30b9500-7598-4f13-a988-53396fa976b0",
+    },
+  ],
+}

@@ -1,9 +1,10 @@
 import type { Deadline } from "@/types";
 import * as Icons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GoalModal } from "./GoalModal";
 import { Progress } from "@/components/ui/progress";
+import { parseDateOnly } from "@/lib/date";
 
 interface GoalCardProps {
   goal: Deadline;
@@ -14,13 +15,24 @@ interface GoalCardProps {
 
 export function GoalCard({ goal, editable = false, onSave, onDelete }: GoalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [today, setToday] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const current = new Date();
+    current.setHours(0, 0, 0, 0);
+    setToday(current);
+  }, []);
 
   const { daysRemaining, percentComplete, isOverdue } = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    if (!today) {
+      return {
+        daysRemaining: null,
+        percentComplete: goal.progresso ?? (goal.status === "Concluído" ? 100 : 0),
+        isOverdue: false,
+      };
+    }
 
-    const targetDate = new Date(goal.dataPrazo);
-    targetDate.setHours(0, 0, 0, 0);
+    const targetDate = parseDateOnly(goal.dataPrazo);
 
     const msPerDay = 1000 * 60 * 60 * 24;
     const daysRemain = Math.ceil((targetDate.getTime() - today.getTime()) / msPerDay);
@@ -40,7 +52,7 @@ export function GoalCard({ goal, editable = false, onSave, onDelete }: GoalCardP
     }
 
     // Calcular progresso automaticamente baseado em tempo decorrido
-    const createdDate = new Date(goal.dataPrazo);
+    const createdDate = parseDateOnly(goal.dataPrazo);
     createdDate.setDate(createdDate.getDate() - 60); // Assume criada há 60 dias antes do prazo
 
     const totalDays = Math.ceil((targetDate.getTime() - createdDate.getTime()) / msPerDay);
@@ -52,7 +64,7 @@ export function GoalCard({ goal, editable = false, onSave, onDelete }: GoalCardP
       percentComplete: Math.round(percent),
       isOverdue: daysRemain < 0,
     };
-  }, [goal]);
+  }, [goal, today]);
 
   const priorityConfig = {
     Alta: {
@@ -122,7 +134,9 @@ export function GoalCard({ goal, editable = false, onSave, onDelete }: GoalCardP
           <div
             className={`text-xs font-medium ${isOverdue ? "text-destructive" : "text-muted-foreground"}`}
           >
-            {isOverdue ? (
+            {daysRemaining === null ? (
+              <span>Calculando prazo...</span>
+            ) : isOverdue ? (
               <span>⚠️ Prazo vencido há {Math.abs(daysRemaining)} dias</span>
             ) : daysRemaining === 0 ? (
               <span>🔥 Prazo é hoje!</span>
