@@ -2,8 +2,7 @@ import { profile } from "@/data/profile";
 import { GradientCard } from "@/components/ui-custom/GradientCard";
 import { InternshipTimer } from "@/components/ui-custom/InternshipTimer";
 import { Github, Linkedin, Building2, Briefcase, Calendar } from "lucide-react";
-
-const fmt = (d: string) => new Date(d).toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
+import { formatMonthYear } from "@/lib/date";
 
 export function HeroSection() {
   return (
@@ -19,15 +18,23 @@ export function HeroSection() {
             <span className="bg-clip-text text-transparent gradient-primary">{profile.name}</span>
           </h1>
           <p className="mt-3 text-lg md:text-xl font-medium text-foreground">{profile.title}</p>
-          <p className="mt-2 text-muted-foreground">{profile.subtitle}</p>
+          <p className="mt-2 text-muted-foreground dark:text-white">{profile.subtitle}</p>
           <p className="mt-6 max-w-xl text-foreground/80">{profile.bio}</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <a href={profile.github} target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full gradient-primary text-white font-medium shadow-soft hover-scale">
+            <a
+              href={profile.github}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full gradient-primary text-white font-medium shadow-soft hover-scale"
+            >
               <Github className="h-4 w-4" /> GitHub
             </a>
-            <a href={profile.linkedin} target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-card border border-border font-medium hover:border-primary hover-scale">
+            <a
+              href={profile.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-card border border-border font-medium hover:border-primary hover-scale"
+            >
               <Linkedin className="h-4 w-4" /> LinkedIn
             </a>
           </div>
@@ -38,8 +45,8 @@ export function HeroSection() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 {profile.profileImage ? (
-                  <img 
-                    src={profile.profileImage} 
+                  <img
+                    src={profile.profileImage}
                     alt={profile.name}
                     className="h-12 w-12 rounded-2xl object-cover shadow-soft"
                   />
@@ -54,12 +61,21 @@ export function HeroSection() {
                 </div>
               </div>
               <div className="space-y-2 text-sm">
-                <p className="flex items-center gap-2"><Building2 className="h-4 w-4 text-primary-deep" /> {profile.company}</p>
-                <p className="flex items-center gap-2"><Briefcase className="h-4 w-4 text-primary-deep" /> {profile.area}</p>
-                <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-primary-deep" /> {fmt(profile.startDate)} — {fmt(profile.endDate)}</p>
+                <p className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-primary-deep" /> {profile.company}
+                </p>
+                <p className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4 text-primary-deep" /> {profile.area}
+                </p>
+                <p className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-primary-deep" />{" "}
+                  {formatMonthYear(profile.startDate)} — {formatMonthYear(profile.endDate)}
+                </p>
               </div>
               <InternshipTimer start={profile.startDate} end={profile.endDate} />
-              <p className="text-xs text-muted-foreground pt-1">Última atualização: {profile.lastUpdate}</p>
+              <p className="text-xs text-muted-foreground pt-1">
+                Última atualização: {profile.lastUpdate}
+              </p>
             </div>
           </GradientCard>
         </div>

@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
-import type { Deadline, GoalStatus } from "@/types";
+import type { Deadline, GoalCategory, GoalPriority, GoalStatus } from "@/types";
 import { GoalCard } from "../ui-custom/GoalCard";
 import { GoalModal } from "../ui-custom/GoalModal";
+import { FilterSelect } from "../ui-custom/FilterSelect";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, Clock, Target, Plus } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -23,10 +24,26 @@ function newGoalTemplate(): Deadline {
   };
 }
 
+const PRIORITY_OPTIONS = ["Todas", "Alta", "Média", "Baixa"] as const;
+const CATEGORY_OPTIONS = [
+  "Todas",
+  "Backend",
+  "Cloud",
+  "Data Engineering",
+  "DevOps",
+  "Estudos",
+] as const;
+const SORT_OPTIONS = ["Prazo mais próximo", "Mais recentes", "Prioridade"] as const;
+
+const PRIORITY_WEIGHT: Record<GoalPriority, number> = { Alta: 0, Média: 1, Baixa: 2 };
+
 export function GoalsSection({ deadlines }: { deadlines: Deadline[] }) {
   const isAdmin = useIsAdmin();
   const router = useRouter();
   const [filterStatus, setFilterStatus] = useState<GoalStatus | "Todos">("Todos");
+  const [filterPriority, setFilterPriority] = useState<GoalPriority | "Todas">("Todas");
+  const [filterCategory, setFilterCategory] = useState<GoalCategory | "Todas">("Todas");
+  const [sortBy, setSortBy] = useState<(typeof SORT_OPTIONS)[number]>("Prazo mais próximo");
   const [newGoal, setNewGoal] = useState<Deadline | null>(null);
 
   const stats = useMemo(() => {
@@ -41,13 +58,27 @@ export function GoalsSection({ deadlines }: { deadlines: Deadline[] }) {
     if (filterStatus !== "Todos") {
       result = result.filter((d) => d.status === filterStatus);
     }
-    // Ordenar por data mais próxima primeiro
+    if (filterPriority !== "Todas") {
+      result = result.filter((d) => d.prioridade === filterPriority);
+    }
+    if (filterCategory !== "Todas") {
+      result = result.filter((d) => d.categoria === filterCategory);
+    }
+    const byDeadline = (a: Deadline, b: Deadline) =>
+      new Date(a.dataPrazo).getTime() - new Date(b.dataPrazo).getTime();
     return [...result].sort((a, b) => {
-      const dateA = new Date(a.dataPrazo).getTime();
-      const dateB = new Date(b.dataPrazo).getTime();
-      return dateA - dateB;
+      if (sortBy === "Mais recentes") {
+        const diff =
+          new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime();
+        return diff !== 0 ? diff : byDeadline(b, a);
+      }
+      if (sortBy === "Prioridade") {
+        const diff = PRIORITY_WEIGHT[a.prioridade] - PRIORITY_WEIGHT[b.prioridade];
+        return diff !== 0 ? diff : byDeadline(a, b);
+      }
+      return byDeadline(a, b);
     });
-  }, [deadlines, filterStatus]);
+  }, [deadlines, filterStatus, filterPriority, filterCategory, sortBy]);
 
   const handleSaveGoal = async (goal: Deadline) => {
     try {
@@ -120,7 +151,7 @@ export function GoalsSection({ deadlines }: { deadlines: Deadline[] }) {
       </div>
 
       {/* Abas de Filtro */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
         {(["Todos", "Planejado", "Em progresso", "Concluído"] as const).map((status) => (
           <button
             key={status}
@@ -134,6 +165,44 @@ export function GoalsSection({ deadlines }: { deadlines: Deadline[] }) {
             {status}
           </button>
         ))}
+      </div>
+
+      {/* Ordenação e filtros */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <FilterSelect
+          label="Ordenar por"
+          options={SORT_OPTIONS}
+          value={sortBy}
+          onChange={(v) => setSortBy(v as (typeof SORT_OPTIONS)[number])}
+        />
+        <FilterSelect
+          label="Prioridade"
+          options={PRIORITY_OPTIONS}
+          value={filterPriority}
+          onChange={(v) => setFilterPriority(v as GoalPriority | "Todas")}
+        />
+        <FilterSelect
+          label="Categoria"
+          options={CATEGORY_OPTIONS}
+          value={filterCategory}
+          onChange={(v) => setFilterCategory(v as GoalCategory | "Todas")}
+        />
+        {(filterPriority !== "Todas" ||
+          filterCategory !== "Todas" ||
+          filterStatus !== "Todos" ||
+          sortBy !== "Prazo mais próximo") && (
+          <button
+            onClick={() => {
+              setFilterStatus("Todos");
+              setFilterPriority("Todas");
+              setFilterCategory("Todas");
+              setSortBy("Prazo mais próximo");
+            }}
+            className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground transition"
+          >
+            Limpar filtros
+          </button>
+        )}
       </div>
 
       {/* Grid de Cards */}

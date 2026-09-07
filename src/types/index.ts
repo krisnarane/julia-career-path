@@ -41,6 +41,7 @@ export interface Deadline {
   status: GoalStatus;
   icon?: string; // lucide icon name
   progresso?: number; // Manual progress (0-100), se não informado usa cálculo automático
+  createdAt?: string; // data de criação (usada na ordenação "Mais recentes")
 }
 
 export type ContributionCategory =

@@ -26,6 +26,7 @@ interface GoalRow {
   status: string;
   icon: string | null;
   progresso: number | null;
+  created_at: string;
 }
 
 function rowToDeadline(r: GoalRow): Deadline {
@@ -39,6 +40,7 @@ function rowToDeadline(r: GoalRow): Deadline {
     status: r.status as Deadline["status"],
     icon: r.icon ?? undefined,
     progresso: r.progresso ?? undefined,
+    createdAt: r.created_at,
   };
 }
 
